@@ -2,6 +2,9 @@
 const CONFIG = {
     API_URL: 'https://api.etherscan.io/api',
     CONTRACT_ADDRESS: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+    // Using a well-known Ethereum address for demonstration (USDC contract itself or a large holder)
+    // You can change this to any Ethereum address you want to track
+    ADDRESS: '0x28C6c06298d514Db089934071355E5743bf21d60E', // Example: Binance hot wallet
     API_KEY: '7AGGIWF7SQAM3FRWNY24KWI34ZT6AUHYUQ',
     REFRESH_INTERVAL: 15000, // 15 seconds
     TOKEN_DECIMALS: 6 // USDC has 6 decimals
@@ -170,9 +173,19 @@ async function fetchUSDCBalance() {
     try {
         showLoading();
         
-        const url = `${CONFIG.API_URL}?module=account&action=tokenbalance&contractaddress=${CONFIG.CONTRACT_ADDRESS}&apikey=${CONFIG.API_KEY}`;
+        // Etherscan API requires address parameter for tokenbalance
+        const url = `${CONFIG.API_URL}?module=account&action=tokenbalance&contractaddress=${CONFIG.CONTRACT_ADDRESS}&address=${CONFIG.ADDRESS}&tag=latest&apikey=${CONFIG.API_KEY}`;
         
-        const response = await fetch(url);
+        // Use CORS proxy if direct fetch fails
+        let response;
+        try {
+            response = await fetch(url);
+        } catch (fetchError) {
+            // If CORS error, try with a CORS proxy
+            console.log('Direct fetch failed, trying CORS proxy...');
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+            response = await fetch(proxyUrl);
+        }
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -186,16 +199,36 @@ async function fetchUSDCBalance() {
             updateStatus('connected', 'Connected');
             hideLoading();
         } else {
-            throw new Error(data.message || 'API returned an error');
+            throw new Error(data.message || data.result || 'API returned an error');
         }
     } catch (error) {
         console.error('Error fetching USDC balance:', error);
         updateStatus('error', 'Connection Error');
         hideLoading();
         
-        // Show error in UI
+        // Show error in UI with more details
         elements.balanceValue.textContent = 'Error';
-        elements.balanceFormatted.textContent = 'Failed to fetch data';
+        elements.balanceFormatted.textContent = `Failed to fetch data: ${error.message}`;
+        
+        // Update table with error info
+        elements.tableBody.innerHTML = `
+            <tr>
+                <td>Error</td>
+                <td>${error.message}</td>
+            </tr>
+            <tr>
+                <td>Contract Address</td>
+                <td>${CONFIG.CONTRACT_ADDRESS}</td>
+            </tr>
+            <tr>
+                <td>Tracked Address</td>
+                <td>${CONFIG.ADDRESS}</td>
+            </tr>
+            <tr>
+                <td>Last Attempt</td>
+                <td>${new Date().toLocaleString()}</td>
+            </tr>
+        `;
     }
 }
 
@@ -234,6 +267,10 @@ function updateDashboard(balance) {
         <tr>
             <td>Contract Address</td>
             <td>${CONFIG.CONTRACT_ADDRESS}</td>
+        </tr>
+        <tr>
+            <td>Tracked Address</td>
+            <td>${CONFIG.ADDRESS}</td>
         </tr>
         <tr>
             <td>Last Updated</td>
