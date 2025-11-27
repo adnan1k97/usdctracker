@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USDC Dashboard - Web3 Analytics</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1 class="logo">🌐 USDC Dashboard</h1>
+                <div class="header-info">
+                    <span class="status-indicator" id="statusIndicator">
+                        <span class="status-dot"></span>
+                        <span id="statusText">Connecting...</span>
+                    </span>
+                    <span class="last-update" id="lastUpdate">Last update: --</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard">
+            <!-- Number Widget -->
+            <section class="widget number-widget">
+                <div class="widget-header">
+                    <h2>USDC Balance</h2>
+                    <button class="refresh-btn" id="refreshBtn" title="Refresh Data">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0118.8-4.3M22 12.5a10 10 0 01-18.8 4.2"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="widget-content">
+                    <div class="loading-spinner" id="numberLoading"></div>
+                    <div class="balance-display" id="balanceDisplay">
+                        <span class="balance-value" id="balanceValue">--</span>
+                        <span class="balance-label">USDC</span>
+                    </div>
+                    <div class="balance-formatted" id="balanceFormatted">--</div>
+                </div>
+            </section>
+
+            <!-- Chart Widget -->
+            <section class="widget chart-widget">
+                <div class="widget-header">
+                    <h2>Balance History</h2>
+                </div>
+                <div class="widget-content">
+                    <div class="loading-spinner" id="chartLoading"></div>
+                    <canvas id="balanceChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Table Widget -->
+            <section class="widget table-widget">
+                <div class="widget-header">
+                    <h2>Raw Data</h2>
+                </div>
+                <div class="widget-content">
+                    <div class="loading-spinner" id="tableLoading"></div>
+                    <div class="table-container">
+                        <table id="dataTable">
+                            <thead>
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <tr>
+                                    <td>Balance</td>
+                                    <td>--</td>
+                                </tr>
+                                <tr>
+                                    <td>Contract Address</td>
+                                    <td>--</td>
+                                </tr>
+                                <tr>
+                                    <td>Last Updated</td>
+                                    <td>--</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
